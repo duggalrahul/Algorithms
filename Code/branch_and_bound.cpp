@@ -8,15 +8,14 @@
 
 #include <string>
 
-
-class cNeutralFile;
+#include "auxiliar_func.h"
 
 using std::fstream;
 using std::string;
 
 using namespace std; 
 
-int inf = 100000000000;// std::numeric_limits<int>::max();
+// std::numeric_limits<int>::max();
 
 double reduce(vector<vector<int>> &distances)
 {
@@ -28,7 +27,7 @@ double reduce(vector<vector<int>> &distances)
     
     for(int row = 0; row < n; ++row)
     {
-       for(int  col= 0; col < n; ++col)
+		for (int col = 0; col < n; ++col)
         { 
             if( distances[row][col] < min_row[row])
             {
@@ -37,14 +36,21 @@ double reduce(vector<vector<int>> &distances)
            
         }
     }
-    
+
+	for (int row = 0; row < n; ++row)
+	{
+		for (int col = 0; col < n; ++col)
+		{
+			if (min_row[row] < inf  && distances[row][col] < inf)// && col>=1)
+				distances[row][col] -= min_row[row];
+		}
+	}
+
     for(int row = 0; row < n; ++row)
     {
        for(int  col= 0; col < n; ++col)
         { 
-		   if (min_row[row]<inf )//&& col>=1)
-				distances[row][col]-=min_row[row];
-
+		   
             if( distances[row][col] < min_col[col])
             {
                 min_col[col]=distances[row][col];
@@ -59,7 +65,7 @@ double reduce(vector<vector<int>> &distances)
     {
        for(int  col= 0; col < n; ++col)
         { 
-		   if (min_col[col]<inf)
+		   if (min_col[col]<inf && distances[row][col]<inf)
 				distances[row][col]-=min_col[col];        
         }
         sum+=min_row[row];
@@ -71,6 +77,9 @@ double reduce(vector<vector<int>> &distances)
     }
     return sum;
 }
+
+
+
 
 double left_choice(vector<vector<int>> &distances, int row_del, int col_del, vector<int> indexes_row, vector<int> indexes_col)
 {
@@ -128,24 +137,23 @@ int branch_and_bound_2(vector<vector<int>> distances, vector<int> indexes_row,ve
     
 	double current_time = double(clock() - start_time) / double(CLOCKS_PER_SEC);
 
-	if (current_time > 600)
+	if (current_time > 6000)
 	{
 		printf("overtime\n");
 		return 0;
 	}
 		
 
-	//printf("deep %d\n",deep++);
-	int lower_plus;
+	int lower_plus=0;
 
 
 	int n = distances.size();
 
-/*	for(int row = 0; row < n; ++row)
+	/*for(int row = 0; row < n; ++row)
 	{
 		for (int col = 0; col < n; ++col)
 		{
-			printf("%.3f ", distances[row][col]);
+			printf("%d ", distances[row][col]);
 
 		}
 		printf("\n");
@@ -156,15 +164,10 @@ int branch_and_bound_2(vector<vector<int>> distances, vector<int> indexes_row,ve
 
         if(left)
         {
-			//printf("left\n");
-
-			//printf("____\n");
+			
 			left_choice(distances, row_choose, col_choose, indexes_row, indexes_col);
 			
             current_solution[indexes_row[row_choose]]=indexes_col[col_choose];
-
-			
-
 			indexes_row.erase(indexes_row.begin()+row_choose);
 			
 			int top = n-1, bot = 0, row;
@@ -180,20 +183,14 @@ int branch_and_bound_2(vector<vector<int>> distances, vector<int> indexes_row,ve
 					bot = top + 1;
 			}
 			row_choose = row;
+			if (indexes_row[row] != indexes_col[col_choose])
+				printf("warning_________________________________________________________________________________\n");
 
-            /*for (int row = 0; row < indexes_col.size(); row++)
-			{
-				if (indexes_row[row] == indexes_col[col_choose])
-				{
-					row_choose = row;
-					break;
-				}
-			}*/
 
 			indexes_col.erase(indexes_col.begin() + col_choose);
             lower_plus=reduce(distances);
-            
-			lower_bound += lower_plus;
+            lower_bound += lower_plus;
+			
             if(distances.size()<=2)
             {
 				current_solution[indexes_row[row_choose]] = indexes_col[1];
@@ -201,9 +198,20 @@ int branch_and_bound_2(vector<vector<int>> distances, vector<int> indexes_row,ve
 				lower_bound += distances[(row_choose + 1) % 2][0] + distances[row_choose][1];
                 if(lower_bound<best)
                 {
+					
                     best=lower_bound;
                     best_sol=current_solution;
-					//printf("Best Solution:  %f  \n", best);				
+					printf("best so far %d\n", best);	
+
+
+					int sum = 0;
+					for (int row = 0; row < current_solution.size(); row++)
+					{
+						
+
+						//sum += distances[row][best_sol[row]];
+					}
+
                 }
                 return 0;
             }
@@ -211,14 +219,13 @@ int branch_and_bound_2(vector<vector<int>> distances, vector<int> indexes_row,ve
         }
         else
         {
-			//printf("right\n");
-			//printf("(%d, %d) %d\n", row_choose, col_choose, distances.size());
+			
             distances[row_choose][col_choose]=inf;
-			//printf("complete\n");
+			
             lower_plus=reduce(distances);
 			
             lower_bound+=lower_plus;
-			//printf("complete2\n");
+			
         }
     }
     else
@@ -227,26 +234,21 @@ int branch_and_bound_2(vector<vector<int>> distances, vector<int> indexes_row,ve
 		row_choose = col_choose = 0;
     }
     
-	//printf("complete3\n");
-    
-	//printf("lower bound %f\n", lower_bound);
-	if (lower_bound>=best || lower_bound==inf)
+	
+	if (lower_bound>=best )
     {
         return 0;
     }
 
-	//row_choose = col_choose;
 	
-	//printf("complete4\n");
     choose_edge(distances,  row_choose, col_choose); 
-	//printf("complete5\n");
-	//printf("(%d, %d) %d\n", row_choose, col_choose, distances.size());
+
+	if (distances[row_choose][col_choose] >= inf)
+		return 0;
 	
 
-	lower_bound += distances[row_choose][col_choose];
-
-	branch_and_bound_2(distances, indexes_row, indexes_col, best, best_sol, current_solution, lower_bound, row_choose, col_choose, true, start_time);
-	//printf("complete6\n");
+	branch_and_bound_2(distances, indexes_row, indexes_col, best, best_sol, current_solution, lower_bound + distances[row_choose][col_choose], row_choose, col_choose, true, start_time);
+	
 	branch_and_bound_2(distances, indexes_row, indexes_col, best, best_sol, current_solution, lower_bound, row_choose, col_choose, false, start_time);
   
       
@@ -259,7 +261,7 @@ int branch_and_bound_2(vector<vector<int>> distances, vector<int> indexes_row,ve
 int main() 
 { 
   
-	string filepath="C:\\Users\\fsenhora3\\Dropbox\\PhD\\classes\\algorithms\\project\\DATA\\DATA\\Berlin.tsp";
+	string filepath="C:\\Users\\fsenhora3\\Dropbox\\PhD\\classes\\algorithms\\project\\DATA\\DATA\\UKansasState.tsp";
 
 	fstream file;
 	file.open((char*) filepath.c_str(), fstream::in);
@@ -307,40 +309,22 @@ if(!file.is_open())
 	}
   }      
 
-  vector<vector<int>> distances;
-  distances.resize(n);
+  
   vector<int> indexes_row, indexes_col, best_sol, current_solution;
   
   best_sol.resize(n,0);
   current_solution.resize(n,0);
   
-
-  int max_dist = 0;
+	vector<vector<int>> distances;
+	distances = compute_dist_matrix( coord_x, coord_y );
+  
   for(int row=0; row<n;row++)
   {
-      for(int col=0; col < n; col++)
-      {
-          //if(row!=col)
-            distances[row].push_back(int (sqrt(pow(coord_x[row]-coord_x[col],2) +pow(coord_y[row]-coord_y[col],2))+0.50000000001));
-          //else
-           //   distances[row].push_back(inf);
-		  if (distances[row][col]>max_dist)
-			  max_dist = distances[row][col] + 1;
-		  
-      }  
 	  
         indexes_row.push_back(row);
         indexes_col.push_back(row);
   }
-  printf("max distanace %d\n", max_dist);
-  max_dist *= n;
-  inf = max_dist;
   
-  for (int row = 0; row < n; row++)
-  {
-	  distances[row][row] = max_dist;
-  }
-  printf("inf distanace %d\n", inf);
 
  int best=inf, lower_bound=0;
  int row_choose=-1, col_choose=-1;
