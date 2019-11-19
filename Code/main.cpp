@@ -71,16 +71,20 @@ vector<tuple<int,float,float>> read_tsp_file(string filename){
 	vector<tuple<int,float,float>> instance;
 	ifstream tspfile(filename);
 	string line;
-	
+	int skip_flag = 1;
 
 	if(tspfile.is_open()){
-		
-		int line_count = 0;
 		while ( getline (tspfile,line) )
 	    {
-	    	line_count++;
-			if(line_count<6) continue; // skip first 6 lines in a file.
-	      	
+	    	// skip until you encounter a line saying "NODE_COORD_SECTION"
+			if((string)"NODE_COORD_SECTION" == line){
+	    		skip_flag = 0;
+	    		continue;
+	    	} 
+	    	if(skip_flag){
+	    		continue;
+	    	}
+
 	      	int index;
 	      	float x_coordinate,y_coordinate;
 
@@ -98,10 +102,15 @@ vector<tuple<int,float,float>> read_tsp_file(string filename){
 
 			    instance.push_back(city);
 	      	}
-	      	
+	      	else{
+	      		break;
+	      	}	      	
 	    }
+
 	    tspfile.close();
 	}
+
+
 	
 
     return instance;
