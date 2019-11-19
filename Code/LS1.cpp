@@ -27,7 +27,7 @@ std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int se
     // Create the distance matrix
     for(unsigned int row = 0; row < nVertices; row++)
     {
-        for(unsigned int col = 0; col <= row; col++)
+        for(unsigned int col = 0; col <nVertices; col++)
         {
             float dx = get<1>(instance[row])-get<1>(instance[col]);
             float dy = get<2>(instance[row])-get<2>(instance[col]);
@@ -40,13 +40,12 @@ std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int se
       }  
     }
 
-    double timeStart = clock();
+    double timeStart = clock(), timeEnd = 0;
     distFromPath = dist[seed];
     vertexOnPath[seed] = true;
 
     // Add the second vertex to path
-    int newVertex = 0;
-    newVertex =  std::min_element(distFromPath.begin(),distFromPath.end())-distFromPath.begin();
+    int newVertex =  std::min_element(distFromPath.begin(),distFromPath.end())-distFromPath.begin();
     path.push_back(newVertex);
     pathLength += dist[seed][newVertex];
     vertexOnPath[newVertex] = true;
@@ -59,11 +58,6 @@ std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int se
 
     // Start creating the Ham-Cycle
     while(path.size() < nVertices){
-
-        if ((clock() - timeStart) / CLOCKS_PER_SEC >= time) {
-            printf("Maximum allowed time exceeded.\n");
-            return path;
-        }
 
         // Find the next vertex to be added to the path
         newVertex =  std::min_element(distFromPath.begin(),distFromPath.end())-distFromPath.begin();
@@ -79,7 +73,7 @@ std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int se
         int insertAfter = 0;
         int df = INT_MAX;
         for( unsigned int i = 0; i < path.size()-1;  i++){
-            int d = dist[newVertex][path[i]]+dist[newVertex][path[i+1]]-dist[path[i]][path[i+1]];
+            int d = dist[path[i]][newVertex] + dist[newVertex][path[i+1]] - dist[path[i]][path[i+1]];
             if(d < df){
                 df = d;
                 insertAfter = i;
@@ -88,14 +82,19 @@ std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int se
         pathLength += df;
         path.insert(path.begin()+insertAfter+1, newVertex);
 
+        timeEnd = (clock() - timeStart) / CLOCKS_PER_SEC;
+        if ( timeEnd >= time) {
+            printf("Maximum allowed time exceeded.\n");
+            return path;
+        }
     }
-
+    pathLength += dist[path[0]][path.back()];
     path.push_back(pathLength);
     // Print out the solution
     for(unsigned int i = 0; i < path.size(); i++){
         std::cout<<path[i]<<" ";
     }
     std::cout<<std::endl;
-    
+    std::cout<<"time:"<< timeEnd << endl; 
     return path;
 }

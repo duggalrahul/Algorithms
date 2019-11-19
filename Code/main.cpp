@@ -8,6 +8,7 @@
 #include <stdlib.h> 
 #include <sstream>
 #include <iterator>
+#include "LS1.cpp"
   
 
 using namespace std;
@@ -144,8 +145,7 @@ int main(int argc, char** argv){
 		// solution = Approx(instance,time,seed);
 	}
 	else if(algorithm == (string)"LS1"){
-		// add call to LS1 algorithm here
-		// solution = LS1(instance,time,seed);
+		LS1(instance,time,seed);
 	}
 	else if(algorithm == (string)"LS2"){
 		// add call to LS2 algorithm here
