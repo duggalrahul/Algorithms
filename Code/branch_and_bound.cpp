@@ -290,9 +290,7 @@ if(!file.is_open())
       
       printf("Locations: %d \n", n);
       coord_x.resize(n,0);
-      coord_y.resize(n,0);
-      
-      
+      coord_y.resize(n,0);      
     }
 	else if (label == "NODE_COORD_SECTION")
 	{
