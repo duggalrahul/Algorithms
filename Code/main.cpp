@@ -136,9 +136,14 @@ int main(int argc, char** argv){
 	vector<tuple<int,float,float>> instance;
 	instance = read_tsp_file(filename);
 
+	vector<vector<int>> distance_matrix = compute_dist_matrix( instance );
+
 	if(algorithm == (string)"BnB"){
-		// add call to branch and bound algorithm here
-		// solution = BnB(instance,time,seed);
+		vector<int>  best_sol;
+		best_sol.resize(n, 0);
+		int best = inf;
+		vector<tuple<int, double>> trace;
+		branch_and_bound_2(distance_matrix,  time, best, best_sol, trace);
 	}
 	else if(algorithm == (string)"Approx"){
 		// add call to Approx algorithm here

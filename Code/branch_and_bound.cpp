@@ -218,14 +218,16 @@ use the default value.
 * OUTPUT:
 * Return: 0 ( no meaning )
 */
-int branch_and_bound_2(vector<vector<int>> distances,  clock_t start_time, double max_time,
+int branch_and_bound_2(vector<vector<int>> distances, double max_time,
 	int &best, vector<int> &best_sol, vector<tuple<int, double>> &trace, vector<int> current_solution = vector<int>(), 
 	vector<int> indexes_row = vector<int>(), vector<int> indexes_col = vector<int>(), int lower_bound = inf,
-	int row_choose=-1, int col_choose=-1, bool left=true)
+	int row_choose = -1, int col_choose = -1, bool left = true, clock_t start_time = clock())
 {
     
+	
 	// Check how much time has elapsed since the beginning of the algorithm.
 	double current_time = double(clock() - start_time) / double(CLOCKS_PER_SEC);
+	
 
 	// If the elapsed time is greater than the time limit stops the algorithm.
 	if (current_time > max_time)
@@ -346,12 +348,12 @@ int branch_and_bound_2(vector<vector<int>> distances,  clock_t start_time, doubl
 		return 0;
 	
 	// Add the edge (row_choose, col_choose) to the solution and solve the branch considering this sub-problem
-	branch_and_bound_2(distances, start_time, max_time, best, best_sol, trace, current_solution, indexes_row, indexes_col,
-		lower_bound + distances[row_choose][col_choose], row_choose, col_choose, true);
+	branch_and_bound_2(distances, max_time, best, best_sol, trace, current_solution, indexes_row, indexes_col,
+		lower_bound + distances[row_choose][col_choose], row_choose, col_choose, true, start_time);
 	
 	// Exclude the edge (row_choose, col_choose) from the solution and solve the branch considering this sub-problem
-	branch_and_bound_2(distances, start_time, max_time, best, best_sol, trace, current_solution, indexes_row, indexes_col,
-		lower_bound, row_choose, col_choose, false);
+	branch_and_bound_2(distances, max_time, best, best_sol, trace, current_solution, indexes_row, indexes_col,
+		lower_bound, row_choose, col_choose, false, start_time);
      
     return 0;
 }
@@ -451,7 +453,7 @@ int main()
 		vector<tuple<int, double>> trace;
 		double max_time = 60 * 1;
 
-		branch_and_bound_2(distances, start_time, max_time, best, best_sol, trace);
+		branch_and_bound_2(distances, max_time, best, best_sol, trace);
 
 
 
