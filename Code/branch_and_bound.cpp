@@ -1,20 +1,4 @@
-#include <stdio.h>
-#include <vector>
-#include <time.h>
-#include <limits>
-#include <math.h>
-#include <stdlib.h> 
-#include <fstream>
-
-#include <string>
-#include <tuple>
-
-#include "auxiliar_func.h"
-
-using std::fstream;
-using std::string;
-
-using namespace std; 
+#include "branch_and_bound.h"
 
 
 /*
@@ -358,7 +342,7 @@ int branch_and_bound_2(vector<vector<int>> distances, double max_time,
     return 0;
 }
 
-
+/*
 
 int main() 
 { 
@@ -485,4 +469,4 @@ int main()
   system("pause");
 
     return 0; 
-} 
+} */

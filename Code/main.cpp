@@ -9,7 +9,7 @@
 #include <sstream>
 #include <iterator>
 #include "LS1.cpp"
-  
+#include "branch_and_bound.h"
 
 using namespace std;
 
