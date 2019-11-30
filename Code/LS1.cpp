@@ -1,12 +1,6 @@
-#include <vector> 
-#include <map>
-#include <bits/stdc++.h> 
-#include <math.h>
-#include <time.h>
-#include <tuple>
-using namespace std;
+#include "LS1.h"
 
-std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int seed){
+std::vector<int> LS1(vector<tuple<int, double, double>> instance, float time, int seed){
 
     unsigned int nVertices = instance.size();
 
@@ -29,8 +23,8 @@ std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int se
     {
         for(unsigned int col = 0; col <nVertices; col++)
         {
-            float dx = get<1>(instance[row])-get<1>(instance[col]);
-            float dy = get<2>(instance[row])-get<2>(instance[col]);
+			double dx = get<1>(instance[row]) - get<1>(instance[col]);
+			double dy = get<2>(instance[row]) - get<2>(instance[col]);
             if(row!=col){
                 dist[row][col] = int(sqrt(pow(dx,2) + pow(dy,2))+0.50000000001);
                 dist[col][row] = dist[row][col];

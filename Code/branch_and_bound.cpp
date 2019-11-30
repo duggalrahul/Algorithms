@@ -202,10 +202,10 @@ use the default value.
 * OUTPUT:
 * Return: 0 ( no meaning )
 */
-int branch_and_bound_2(vector<vector<int>> distances, double max_time,
-	int &best, vector<int> &best_sol, vector<tuple<int, double>> &trace, vector<int> current_solution = vector<int>(), 
-	vector<int> indexes_row = vector<int>(), vector<int> indexes_col = vector<int>(), int lower_bound = inf,
-	int row_choose = -1, int col_choose = -1, bool left = true, clock_t start_time = clock())
+int branch_and_bound(vector<vector<int>> distances, double max_time,
+	int &best, vector<int> &best_sol, vector<tuple<int, double>> &trace, vector<int> current_solution, 
+	vector<int> indexes_row, vector<int> indexes_col , int lower_bound,
+	int row_choose, int col_choose, bool left, clock_t start_time)
 {
     
 	
@@ -332,11 +332,11 @@ int branch_and_bound_2(vector<vector<int>> distances, double max_time,
 		return 0;
 	
 	// Add the edge (row_choose, col_choose) to the solution and solve the branch considering this sub-problem
-	branch_and_bound_2(distances, max_time, best, best_sol, trace, current_solution, indexes_row, indexes_col,
+	branch_and_bound(distances, max_time, best, best_sol, trace, current_solution, indexes_row, indexes_col,
 		lower_bound + distances[row_choose][col_choose], row_choose, col_choose, true, start_time);
 	
 	// Exclude the edge (row_choose, col_choose) from the solution and solve the branch considering this sub-problem
-	branch_and_bound_2(distances, max_time, best, best_sol, trace, current_solution, indexes_row, indexes_col,
+	branch_and_bound(distances, max_time, best, best_sol, trace, current_solution, indexes_row, indexes_col,
 		lower_bound, row_choose, col_choose, false, start_time);
      
     return 0;

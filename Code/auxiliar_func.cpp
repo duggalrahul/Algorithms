@@ -77,15 +77,14 @@ vector<vector<int>> compute_dist_matrix(vector<float> coord_x, vector<float> coo
 }
 
 
-vector<vector<int>> compute_dist_matrix(vector<tuple<int, float, float>> instance)
+vector<vector<int>> compute_dist_matrix(vector<tuple<int, double, double>> instance)
 {
 
 	int n = instance.size();
 	vector<vector<int>> distances;
 
-
 	distances.resize(n);
-
+	
 
 	int max_dist = 0;
 	for (int row = 0; row<n; row++)
@@ -93,8 +92,8 @@ vector<vector<int>> compute_dist_matrix(vector<tuple<int, float, float>> instanc
 		for (int col = 0; col < n; col++)
 		{
 
-			distances[row].push_back(int(sqrt(pow(std::get<1>(instance[row]) - std::get<1>(coord_x[col]), 2) 
-				+ pow(std::get<2>(coord_y[row]) - std::get<2>(coord_y[col]), 2)) + 0.50000000001));
+			distances[row].push_back(int(sqrt(pow(std::get<1>(instance[row]) - std::get<1>(instance[col]), 2)
+				+ pow(std::get<2>(instance[row]) - std::get<2>(instance[col]), 2)) + 0.50000000001));
 
 			if (distances[row][col]>max_dist)
 				max_dist = distances[row][col] + 1;
