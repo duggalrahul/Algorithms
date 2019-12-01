@@ -8,4 +8,5 @@
 #include <tuple>
 using namespace std;
 
-std::vector<int> LS1(vector<tuple<int, double, double>> instance, float time, int seed);
+tuple<int,vector<int>> Approx(vector<vector<int>> dist, float time, int seed);
+

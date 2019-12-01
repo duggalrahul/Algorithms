@@ -8,8 +8,8 @@
 #include <stdlib.h> 
 #include <sstream>
 #include <iterator>
-#include "LS1.h"
 #include "branch_and_bound.h"
+#include "Approx.h"
 
 using namespace std;
 
@@ -181,11 +181,17 @@ int main(int argc, char** argv){
 		printf("Finished!!\n");
 	}
 	else if(algorithm == (string)"Approx"){
-		// add call to Approx algorithm here
-		// solution = Approx(instance,time,seed);
+		vector<vector<int>> distance_matrix = compute_dist_matrix( instance );
+		double start_time = double(clock());
+		tuple<int,vector<int>> solution = Approx(distance_matrix, time, seed);
+		output_solution(filename, algorithm, time,  std::get<0>(solution),  std::get<1>(solution));
+		double runtime = double(clock() - start_time) / double(CLOCKS_PER_SEC);
+		printf("Best Solution (sum):  %d  \n", std::get<0>(solution));
+		printf("Total time:  %f s \n", runtime);
 	}
 	else if(algorithm == (string)"LS1"){
-		LS1(instance,time,seed);
+		// add call to LS1 algorithm here
+		// solution = LS2(instance,time,seed);
 	}
 	else if(algorithm == (string)"LS2"){
 		// add call to LS2 algorithm here
