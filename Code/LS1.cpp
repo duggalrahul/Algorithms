@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <vector> 
 #include <map>
 #include <bits/stdc++.h> 
@@ -8,6 +9,11 @@
 using namespace std;
 
 std::tuple<double,vector<int>> LS1(vector<tuple<int,float,float>> instance, float time, int seed){
+=======
+#include "LS1.h"
+
+std::vector<int> LS1(vector<tuple<int, double, double>> instance, float time, int seed){
+>>>>>>> a50b97a8d65933397980c45d367613c61f92706b
 
     unsigned int nVertices = instance.size();
     td::tuple<double,vector<int>> result;
@@ -22,6 +28,7 @@ std::tuple<double,vector<int>> LS1(vector<tuple<int,float,float>> instance, floa
 
     int pathLength = 0;
 
+<<<<<<< HEAD
     // for(unsigned int row = 0; row < nVertices; row++){
     //     dist[row].resize(nVertices);
     // }
@@ -40,6 +47,26 @@ std::tuple<double,vector<int>> LS1(vector<tuple<int,float,float>> instance, floa
     //             dist[row][col] = INT_MAX;          
     //   }  
     // }
+=======
+    for(unsigned int row = 0; row < nVertices; row++){
+        dist[row].resize(nVertices);
+    }
+    // Create the distance matrix
+    for(unsigned int row = 0; row < nVertices; row++)
+    {
+        for(unsigned int col = 0; col <nVertices; col++)
+        {
+			double dx = get<1>(instance[row]) - get<1>(instance[col]);
+			double dy = get<2>(instance[row]) - get<2>(instance[col]);
+            if(row!=col){
+                dist[row][col] = int(sqrt(pow(dx,2) + pow(dy,2))+0.50000000001);
+                dist[col][row] = dist[row][col];
+            }
+            else
+                dist[row][col] = INT_MAX;          
+      }  
+    }
+>>>>>>> a50b97a8d65933397980c45d367613c61f92706b
 
     double timeStart = clock(), timeEnd = 0;
     distFromPath = dist[seed];
