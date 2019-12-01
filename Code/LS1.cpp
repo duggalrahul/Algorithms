@@ -4,14 +4,15 @@
 #include <math.h>
 #include <time.h>
 #include <tuple>
+#include "auxiliar_func.h"
 using namespace std;
 
-std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int seed){
+std::tuple<double,vector<int>> LS1(vector<tuple<int,float,float>> instance, float time, int seed){
 
     unsigned int nVertices = instance.size();
-
+    td::tuple<double,vector<int>> result;
     // Maintain a distance matrix to keep track
-    vector<vector<int>> dist(nVertices);  
+    // vector<vector<int>> dist(nVertices);  
     // Store the TSP route in path
     std::vector<int> path{seed};
     // Store the distance of all vertices from path
@@ -21,24 +22,24 @@ std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int se
 
     int pathLength = 0;
 
-    for(unsigned int row = 0; row < nVertices; row++){
-        dist[row].resize(nVertices);
-    }
-    // Create the distance matrix
-    for(unsigned int row = 0; row < nVertices; row++)
-    {
-        for(unsigned int col = 0; col <nVertices; col++)
-        {
-            float dx = get<1>(instance[row])-get<1>(instance[col]);
-            float dy = get<2>(instance[row])-get<2>(instance[col]);
-            if(row!=col){
-                dist[row][col] = int(sqrt(pow(dx,2) + pow(dy,2))+0.50000000001);
-                dist[col][row] = dist[row][col];
-            }
-            else
-                dist[row][col] = INT_MAX;          
-      }  
-    }
+    // for(unsigned int row = 0; row < nVertices; row++){
+    //     dist[row].resize(nVertices);
+    // }
+    // // Create the distance matrix
+    // for(unsigned int row = 0; row < nVertices; row++)
+    // {
+    //     for(unsigned int col = 0; col <nVertices; col++)
+    //     {
+    //         float dx = get<1>(instance[row])-get<1>(instance[col]);
+    //         float dy = get<2>(instance[row])-get<2>(instance[col]);
+    //         if(row!=col){
+    //             dist[row][col] = int(sqrt(pow(dx,2) + pow(dy,2))+0.50000000001);
+    //             dist[col][row] = dist[row][col];
+    //         }
+    //         else
+    //             dist[row][col] = INT_MAX;          
+    //   }  
+    // }
 
     double timeStart = clock(), timeEnd = 0;
     distFromPath = dist[seed];
@@ -70,8 +71,8 @@ std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int se
         }
 
         // Insert the newVertex in between an edge such that the increase in TSP length is minimum
-        int insertAfter = 0;
-        int df = INT_MAX;
+        int insertAfter = path.back();
+        int df = dist[path[0]][newVertex] + dist[newVertex][path.back()] - dist[path[0]][path.back()];
         for( unsigned int i = 0; i < path.size()-1;  i++){
             int d = dist[path[i]][newVertex] + dist[newVertex][path[i+1]] - dist[path[i]][path[i+1]];
             if(d < df){
@@ -95,6 +96,7 @@ std::vector<int> LS1(vector<tuple<int,float,float>> instance, float time, int se
         std::cout<<path[i]<<" ";
     }
     std::cout<<std::endl;
-    std::cout<<"time:"<< timeEnd << endl; 
+    result=make_tuple(timeEnd, path);
+    std::cout<<"time:"<< get<0>result << endl; 
     return path;
 }
