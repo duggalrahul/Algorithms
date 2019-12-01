@@ -81,7 +81,11 @@ vector<tuple<int,double,double>> read_tsp_file(string filename){
 	int n, index, idummy;
 	double ddummy;
 
-	
+	if (!tspfile.is_open())
+	{
+		printf("File could not be open.\n");
+		return instance;
+	}
 
 	while (tspfile >> label && label != "EOF")
 	{
@@ -170,6 +174,8 @@ int main(int argc, char** argv){
 			printf(" Solution %d  time %f \n", std::get<0>(trace[row]), std::get<1>(trace[row]));
 
 		}
+
+		output_solution(filename, algorithm, time,  best,  best_sol);
 
 		printf("Finished!!\n");
 	}

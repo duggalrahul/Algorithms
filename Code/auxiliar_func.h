@@ -1,5 +1,4 @@
-#ifndef _AUXILIAR_
-#define _AUXILIAR_
+#pragma once
 
 #include <stdio.h>
 #include <vector>
@@ -26,4 +25,6 @@ vector<vector<int>> compute_dist_matrix(vector<float> coord_x, vector<float> coo
 
 vector<vector<int>> compute_dist_matrix(vector<tuple<int, double, double>> instance);
 
-#endif
+int output_solution(string filename, string method, float cutoff, int random_seed, int best, vector<int> best_sol);
+
+int output_solution(string filename, string method, float cutoff, int best, vector<int> best_sol);

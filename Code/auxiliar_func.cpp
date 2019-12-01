@@ -112,3 +112,81 @@ vector<vector<int>> compute_dist_matrix(vector<tuple<int, double, double>> insta
 
 	return distances;
 }
+
+
+int output_solution(string filename, string method, float cutoff, int random_seed,  int best, vector<int> best_sol)
+{
+	/*const size_t last_slash_idx = filename.find_last_of("\\/");
+
+	string path = filename.substr(0, last_slash_idx);
+
+	if (std::string::npos != last_slash_idx)
+	{
+		filename.erase(0, last_slash_idx + 1);
+	}*/
+
+	// Remove extension if present.
+	const size_t period_idx = filename.rfind('.');
+	if (std::string::npos != period_idx)
+	{
+		filename.erase(period_idx);
+	}
+	filename = filename + "_" + method + "_" + to_string( int (cutoff)) + "_" + to_string(random_seed) + ".sol";
+
+	ofstream sol_file(filename);
+
+	if (sol_file.is_open())
+	{
+		sol_file << best << endl << best_sol[0];
+
+		for (int i = 1; i < best_sol.size(); i++)
+		{
+			sol_file << "," << best_sol[i];
+		}
+		
+		sol_file.close();
+	}
+	else 
+		printf( "File could not be open\n");
+
+	return 0;
+}
+
+
+int output_solution(string filename, string method, float cutoff, int best, vector<int> best_sol)
+{
+	/*const size_t last_slash_idx = filename.find_last_of("\\/");
+
+	string path = filename.substr(0, last_slash_idx);
+
+	if (std::string::npos != last_slash_idx)
+	{
+	filename.erase(0, last_slash_idx + 1);
+	}*/
+
+	// Remove extension if present.
+	const size_t period_idx = filename.rfind('.');
+	if (std::string::npos != period_idx)
+	{
+		filename.erase(period_idx);
+	}
+	filename = filename + "_" + method + "_" + to_string(int(cutoff)) + ".sol";
+
+	ofstream sol_file(filename);
+
+	if (sol_file.is_open())
+	{
+		sol_file << best << endl << best_sol[0];
+
+		for (int i = 1; i < best_sol.size(); i++)
+		{
+			sol_file << "," << best_sol[i];
+		}
+
+		sol_file.close();
+	}
+	else
+		printf("File could not be open\n");
+
+	return 0;
+}
