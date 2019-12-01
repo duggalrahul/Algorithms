@@ -176,6 +176,7 @@ int main(int argc, char** argv){
 		}
 
 		output_solution(filename, algorithm, time,  best,  best_sol);
+		output_trace(filename, algorithm, time, trace);
 
 		printf("Finished!!\n");
 	}

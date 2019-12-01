@@ -116,15 +116,7 @@ vector<vector<int>> compute_dist_matrix(vector<tuple<int, double, double>> insta
 
 int output_solution(string filename, string method, float cutoff, int random_seed,  int best, vector<int> best_sol)
 {
-	/*const size_t last_slash_idx = filename.find_last_of("\\/");
-
-	string path = filename.substr(0, last_slash_idx);
-
-	if (std::string::npos != last_slash_idx)
-	{
-		filename.erase(0, last_slash_idx + 1);
-	}*/
-
+	
 	// Remove extension if present.
 	const size_t period_idx = filename.rfind('.');
 	if (std::string::npos != period_idx)
@@ -155,14 +147,7 @@ int output_solution(string filename, string method, float cutoff, int random_see
 
 int output_solution(string filename, string method, float cutoff, int best, vector<int> best_sol)
 {
-	/*const size_t last_slash_idx = filename.find_last_of("\\/");
-
-	string path = filename.substr(0, last_slash_idx);
-
-	if (std::string::npos != last_slash_idx)
-	{
-	filename.erase(0, last_slash_idx + 1);
-	}*/
+	
 
 	// Remove extension if present.
 	const size_t period_idx = filename.rfind('.');
@@ -181,6 +166,68 @@ int output_solution(string filename, string method, float cutoff, int best, vect
 		for (int i = 1; i < best_sol.size(); i++)
 		{
 			sol_file << "," << best_sol[i];
+		}
+
+		sol_file.close();
+	}
+	else
+		printf("File could not be open\n");
+
+	return 0;
+}
+
+
+
+int output_trace(string filename, string method, float cutoff, int random_seed, vector<tuple<int, double>> trace)
+{
+
+	// Remove extension if present.
+	const size_t period_idx = filename.rfind('.');
+	if (std::string::npos != period_idx)
+	{
+		filename.erase(period_idx);
+	}
+	filename = filename + "_" + method + "_" + to_string(int(cutoff)) + "_" + to_string(random_seed) + ".trace";
+
+	ofstream sol_file(filename);
+
+	if (sol_file.is_open())
+	{
+		
+		for (int i = 0; i < trace.size(); i++)
+		{
+			sol_file << std::fixed << std::setprecision(2) << std::get<1>(trace[i]) << ", " << std::get<0>(trace[i]) << endl;
+		}
+
+		sol_file.close();
+	}
+	else
+		printf("File could not be open\n");
+
+	return 0;
+}
+
+
+int output_trace(string filename, string method, float cutoff, vector<tuple<int, double>> trace)
+{
+
+
+	// Remove extension if present.
+	const size_t period_idx = filename.rfind('.');
+	if (std::string::npos != period_idx)
+	{
+		filename.erase(period_idx);
+	}
+	filename = filename + "_" + method + "_" + to_string(int(cutoff)) + ".trace";
+
+	ofstream sol_file(filename);
+
+	if (sol_file.is_open())
+	{
+		
+		for (int i = 0; i < trace.size(); i++)
+		{
+			sol_file << std::fixed << std::setprecision(2) << std::get<1>(trace[i]) << ", " << std::get<0>(trace[i]) << endl;
 		}
 
 		sol_file.close();
