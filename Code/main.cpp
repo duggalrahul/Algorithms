@@ -20,10 +20,10 @@ void throw_input_parse_error(){
 	cout<<"Please follow the specified input format"<<endl<<INPUT_FORMAT<<endl;
 }
 
-tuple<string,string,float,int> parse_input(int argc, char** argv){
+tuple<string,string,double,int> parse_input(int argc, char** argv){
 	string filename;
 	string algorithm;
-	float time;
+	double time;
 	int seed;
 
 	if (argc != 9) {
@@ -121,14 +121,14 @@ vector<tuple<int,double,double>> read_tsp_file(string filename){
 
 }
 
-typedef tuple<int,float,float> tup;
+typedef tuple<int,double,double> tup;
 typedef vector<tup> vtup;
 
-float get_distance(tup city1, tup city2){
-	float city1_x = get<1>(city1);
-	float city2_x = get<1>(city2);
-	float city1_y = get<2>(city1);
-	float city2_y = get<2>(city2);
+double get_distance(tup city1, tup city2){
+	double city1_x = get<1>(city1);
+	double city2_x = get<1>(city2);
+	double city1_y = get<2>(city1);
+	double city2_y = get<2>(city2);
 
 	return sqrt((city1_x-city2_x)*(city1_x-city2_x) + (city1_y-city2_y)*(city1_y-city2_y));
 }
@@ -142,9 +142,9 @@ bool check_tour_validness(vtup tour){
 	return true;
 }
 
-float get_tour_length(vtup tour){
+double get_tour_length(vtup tour){
 	uint i;
-	float tour_length = 0;
+	double tour_length = 0;
 
 	check_tour_validness(tour);
 	
@@ -170,7 +170,7 @@ vtup get_random_tour(vtup instance,int seed){
 
 // This function implements the 2 opt swap outlined at https://en.wikipedia.org/wiki/2-opt
 vtup two_opt_swap(vtup tour,int i,int k){
-	vector<tuple<int,float,float>> new_tour;
+	vector<tuple<int,double,double>> new_tour;
 	int j;
 
 	// step 1 in wiki
@@ -244,7 +244,7 @@ vtup get_random_neighbour(vtup tour){
 	return two_opt_swap(tour,i,k);
 }
 
-vtup hill_climbing(vtup instance,float time,int seed){
+vtup hill_climbing(vtup instance,double time,int seed){
 
 	const clock_t begin_time = clock();
 	vtup existing_tour = get_random_tour(instance,seed);
@@ -252,14 +252,15 @@ vtup hill_climbing(vtup instance,float time,int seed){
 	double global_best_cost;
 	int i;
 	int iter = 0;
-	float time_in_seconds;
+	double time_in_seconds;
 
 	global_best_cost = get_tour_length(existing_tour);
 
 	while(1){			
 		iter++;
 
-		time_in_seconds = float( clock () - begin_time ) /  CLOCKS_PER_SEC;
+		time_in_seconds = double( clock () - begin_time ) /  CLOCKS_PER_SEC;
+
 
 		if(time_in_seconds > time*60){
 			break;
@@ -269,6 +270,8 @@ vtup hill_climbing(vtup instance,float time,int seed){
 		vector<vtup> neighbours = get_neighbours(existing_tour);
 		double neighbour_best_cost = get_tour_length(existing_tour);
 		long long cost;
+
+		cout<<"time (s) "<<time_in_seconds<< "num neighbours "<<neighbours.size()<<endl;
 
 		// iterate through neighbours to find neighbour with lowest cost
 		for(i=0;i<neighbours.size();i++){
@@ -316,7 +319,7 @@ bool metropolis_criterion(double cost1, double cost2, double T){
 }
 
 
-float simulated_annealing(vtup instance,float time,int seed){
+double simulated_annealing(vtup instance,double time,int seed){
 
 	const clock_t begin_time = clock();
 	vtup existing_tour = get_random_tour(instance,seed);
@@ -325,16 +328,18 @@ float simulated_annealing(vtup instance,float time,int seed){
 
 	// Define annealing parameters
 	int t,max_t = 20000;
-	float T = 10;
-	float a = 0.95; // geometric schedule
+	double T = 10;
+	double a = 0.95; // geometric schedule
 	double best_tour_cost = get_tour_length(existing_tour);
 	double existing_tour_cost = get_tour_length(existing_tour);
 	double neighbour_tour_cost = get_tour_length(existing_tour);
-	float time_in_seconds;
+	double time_in_seconds;
 
 	for(t=1;t<max_t;t++){
 
-		time_in_seconds = float( clock () - begin_time ) /  CLOCKS_PER_SEC;
+		time_in_seconds = double( clock () - begin_time ) /  CLOCKS_PER_SEC;
+
+		// cout<<"time (s) "<<time_in_seconds<<endl;
 
 		if(time_in_seconds > time*60){
 			break;
@@ -372,14 +377,14 @@ float simulated_annealing(vtup instance,float time,int seed){
 
 int main(int argc, char** argv){
 	
-	std::tuple<string,string,float,int> input;
+	std::tuple<string,string,double,int> input;
 
 	input = parse_input(argc, argv);
 
 	// parse input parameters
 	string filename = get<0>(input);
 	string algorithm = get<1>(input);
-	float time = get<2>(input);
+	double time = get<2>(input);
 	int seed = get<3>(input);
 
 	// read .tsp file specified by -inst
@@ -441,6 +446,7 @@ int main(int argc, char** argv){
 		cout<<"Solving using Hill Climbing"<<endl;
 		srand(seed);
 		hill_climbing(instance,time,seed);
+	}
 	else if(algorithm == (string)"LS2"){
 		cout<<"Solving using Simulated Annealing"<<endl;
 		srand(seed);		
