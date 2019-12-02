@@ -8,7 +8,8 @@
 #include <stdlib.h> 
 #include <sstream>
 #include <iterator>
-  
+#include "branch_and_bound.h"
+#include "Approx.h"
 
 using namespace std;
 
@@ -67,51 +68,53 @@ tuple<string,string,float,int> parse_input(int argc, char** argv){
 
 }
 
-vector<tuple<int,float,float>> read_tsp_file(string filename){
-	vector<tuple<int,float,float>> instance;
+vector<tuple<int,double,double>> read_tsp_file(string filename){
+	vector<tuple<int, double, double>> instance;
 	ifstream tspfile(filename);
 	string line;
 	int skip_flag = 1;
-
-	if(tspfile.is_open()){
-		while ( getline (tspfile,line) )
-	    {
-	    	// skip until you encounter a line saying "NODE_COORD_SECTION"
-			if((string)"NODE_COORD_SECTION" == line){
-	    		skip_flag = 0;
-	    		continue;
-	    	} 
-	    	if(skip_flag){
-	    		continue;
-	    	}
-
-	      	int index;
-	      	float x_coordinate,y_coordinate;
-
-	      	if((string)"EOF" != line){
-	      		std::istringstream buf(line);
-    			std::istream_iterator<std::string> beg(buf), end;
-
-    			std::vector<std::string> tokens(beg, end); // done!
-
-			    index = stoi(tokens[0]);
-			    x_coordinate = stof(tokens[1]);
-			    y_coordinate = stof(tokens[2]);
-
-			    auto city = make_tuple(index,x_coordinate,y_coordinate);
-
-			    instance.push_back(city);
-	      	}
-	      	else{
-	      		break;
-	      	}	      	
-	    }
-
-	    tspfile.close();
-	}
-
+	double x_coordinate,y_coordinate;
 
 	
+	
+	string label;
+	int n, index, idummy;
+	double ddummy;
+
+	if (!tspfile.is_open())
+	{
+		printf("File could not be open.\n");
+		return instance;
+	}
+
+	while (tspfile >> label && label != "EOF")
+	{
+
+		if (label == "DIMENSION:")
+		{
+			tspfile >> n;
+
+		}
+		else if (label == "NODE_COORD_SECTION")
+		{
+			for (int i = 0; i < n; ++i)
+			{
+				tspfile >> index;
+				tspfile >> x_coordinate;
+				tspfile >> y_coordinate;
+
+				auto city = make_tuple(index, x_coordinate, y_coordinate);
+
+				instance.push_back(city);
+
+				
+			}
+			
+		}
+	}
+
+	tspfile.close();
+
 
     return instance;
 
@@ -380,22 +383,64 @@ int main(int argc, char** argv){
 	int seed = get<3>(input);
 
 	// read .tsp file specified by -inst
-	vector<tuple<int,float,float>> instance;
+	vector<tuple<int, double, double>> instance;
+
+	printf("%s \n", filename.c_str());
 	instance = read_tsp_file(filename);
 
+	int n = instance.size();
+
+	vector<vector<int>> distance_matrix = compute_dist_matrix( instance );
+
 	if(algorithm == (string)"BnB"){
-		// add call to branch and bound algorithm here
-		// solution = BnB(instance,time,seed);
+		vector<int>  best_sol;
+		best_sol.resize(n, 0);
+		int best = inf;
+		vector<tuple<int, double>> trace;
+		double start_time = double(clock());
+		branch_and_bound(distance_matrix, double (time), best, best_sol, trace);
+
+		printf("Best Solution:  %d \n", best);	
+
+
+		int sum = 0;
+		for (int row = 0; row < n; row++)
+		{
+			//printf(" %d --->  %d \n", row, best_sol[row]);
+
+			sum += distance_matrix[row][best_sol[row]];
+		}
+
+		printf("Best Solution (sum):  %d  \n", sum);
+
+		double runtime = double(clock() - start_time) / double(CLOCKS_PER_SEC);
+
+		printf("Total time:  %f s \n", runtime);
+
+		for (int row = 0; row < trace.size(); row++)
+		{
+			printf(" Solution %d  time %f \n", std::get<0>(trace[row]), std::get<1>(trace[row]));
+
+		}
+
+		output_solution(filename, algorithm, time,  best,  best_sol);
+		output_trace(filename, algorithm, time, trace);
+
+		printf("Finished!!\n");
 	}
 	else if(algorithm == (string)"Approx"){
-		// add call to Approx algorithm here
-		// solution = Approx(instance,time,seed);
+		vector<vector<int>> distance_matrix = compute_dist_matrix( instance );
+		double start_time = double(clock());
+		tuple<int,vector<int>> solution = Approx(distance_matrix, time, seed);
+		output_solution(filename, algorithm, time,  std::get<0>(solution),  std::get<1>(solution));
+		double runtime = double(clock() - start_time) / double(CLOCKS_PER_SEC);
+		printf("Best Solution (sum):  %d  \n", std::get<0>(solution));
+		printf("Total time:  %f s \n", runtime);
 	}
 	else if(algorithm == (string)"LS1"){
 		cout<<"Solving using Hill Climbing"<<endl;
 		srand(seed);
 		hill_climbing(instance,time,seed);
-	}
 	else if(algorithm == (string)"LS2"){
 		cout<<"Solving using Simulated Annealing"<<endl;
 		srand(seed);		
