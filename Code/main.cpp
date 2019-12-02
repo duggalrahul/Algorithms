@@ -243,16 +243,24 @@ vtup get_random_neighbour(vtup tour){
 
 vtup hill_climbing(vtup instance,float time,int seed){
 
+	const clock_t begin_time = clock();
 	vtup existing_tour = get_random_tour(instance,seed);
 	vtup best_neighbouring_tour;
 	double global_best_cost;
 	int i;
 	int iter = 0;
+	float time_in_seconds;
 
 	global_best_cost = get_tour_length(existing_tour);
 
 	while(1){			
 		iter++;
+
+		time_in_seconds = float( clock () - begin_time ) /  CLOCKS_PER_SEC;
+
+		if(time_in_seconds > time*60){
+			break;
+		}
 
 		// generate neighbours of current tour using 2-opt
 		vector<vtup> neighbours = get_neighbours(existing_tour);
@@ -278,13 +286,12 @@ vtup hill_climbing(vtup instance,float time,int seed){
 			break;
 		}
 
-		cout<<"iter "<<iter<<" best cost "<<global_best_cost<<endl;
+		// cout<<"iter "<<iter<<" best cost "<<global_best_cost<<endl;
 
 	}
 
 	cout<<"Original cost was "<<get_tour_length(get_random_tour(instance,seed))<<" new cost is "<<get_tour_length(existing_tour)<<endl;
-	
-
+	cout<<"Time taken (s) "<<time_in_seconds<<endl;
 
 	return existing_tour;
 }
@@ -308,15 +315,10 @@ bool metropolis_criterion(double cost1, double cost2, double T){
 
 float simulated_annealing(vtup instance,float time,int seed){
 
-	
+	const clock_t begin_time = clock();
 	vtup existing_tour = get_random_tour(instance,seed);
 	vtup neighbouring_tour = get_random_neighbour(existing_tour);
 	vtup best_tour;
-
-	// cout<<"Actual tour"<<endl;
-	// print_tour(existing_tour);
-	// cout<<"Neighbour tour"<<endl;
-	// print_tour(neighbouring_tour);
 
 	// Define annealing parameters
 	int t,max_t = 20000;
@@ -325,9 +327,15 @@ float simulated_annealing(vtup instance,float time,int seed){
 	double best_tour_cost = get_tour_length(existing_tour);
 	double existing_tour_cost = get_tour_length(existing_tour);
 	double neighbour_tour_cost = get_tour_length(existing_tour);
+	float time_in_seconds;
 
 	for(t=1;t<max_t;t++){
-		
+
+		time_in_seconds = float( clock () - begin_time ) /  CLOCKS_PER_SEC;
+
+		if(time_in_seconds > time*60){
+			break;
+		}
 
 		// generate random neighbour from current tour
 		vtup neighbouring_tour = get_random_neighbour(existing_tour);
@@ -346,12 +354,13 @@ float simulated_annealing(vtup instance,float time,int seed){
 
 		T = a*T;
 
-		cout<<"best cost "<<best_tour_cost<<endl;
+		// cout<<"best cost "<<best_tour_cost<<endl;
 
 
 	}
 
-
+	cout<<"Original cost was "<<get_tour_length(get_random_tour(instance,seed))<<" new cost is "<<get_tour_length(existing_tour)<<endl;
+	cout<<"Time taken (s) "<<time_in_seconds<<endl;
 
 	return 0;
 }
@@ -383,16 +392,14 @@ int main(int argc, char** argv){
 		// solution = Approx(instance,time,seed);
 	}
 	else if(algorithm == (string)"LS1"){
-		// add call to LS1 algorithm here
-		// solution = LS1(instance,time,seed);
-		srand(seed);		
-		simulated_annealing(instance,time,seed);
-		
-	}
-	else if(algorithm == (string)"LS2"){
-		// add call to LS2 algorithm here
+		cout<<"Solving using Hill Climbing"<<endl;
 		srand(seed);
 		hill_climbing(instance,time,seed);
+	}
+	else if(algorithm == (string)"LS2"){
+		cout<<"Solving using Simulated Annealing"<<endl;
+		srand(seed);		
+		simulated_annealing(instance,time,seed);
 	}
    
   
