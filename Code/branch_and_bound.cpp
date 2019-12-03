@@ -387,6 +387,7 @@ int main()
 
 		vector<double> coord_x, coord_y;
 
+
 		while (file >> label && label != "EOF")
 		{
 
