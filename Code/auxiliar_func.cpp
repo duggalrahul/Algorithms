@@ -264,13 +264,13 @@ int output_trace(string filename, string method, float cutoff, vector<tuple<int,
 
 
 
-double get_distance(tup city1, tup city2){
+int get_distance(tup city1, tup city2){
 	double city1_x = get<1>(city1);
 	double city2_x = get<1>(city2);
 	double city1_y = get<2>(city1);
 	double city2_y = get<2>(city2);
 
-	return sqrt((city1_x-city2_x)*(city1_x-city2_x) + (city1_y-city2_y)*(city1_y-city2_y));
+	return int(sqrt((city1_x-city2_x)*(city1_x-city2_x) + (city1_y-city2_y)*(city1_y-city2_y))+ 0.50000000001);
 }
 
 
@@ -284,7 +284,7 @@ bool check_tour_validness(vtup tour){
 
 double get_tour_length(vtup tour){
 	uint i;
-	double tour_length = 0;
+	int tour_length = 0;
 
 	check_tour_validness(tour);
 	

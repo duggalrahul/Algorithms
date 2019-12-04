@@ -168,7 +168,7 @@ int main(int argc, char** argv){
         output_solution(filename, algorithm, time,  std::get<0>(solution),  std::get<1>(solution));
 	}
 	else if(algorithm == (string)"LS1"){		
-		tuple<vector<int>,double,double> result;
+		tuple<vector<int>,int,double> result;
 		
 		srand(seed);
 		vector<tuple<int, double>> trace;
@@ -180,7 +180,7 @@ int main(int argc, char** argv){
 			
 	}
 	else if(algorithm == (string)"LS2"){		
-		tuple<vector<int>,double,double> result;
+		tuple<vector<int>,int,double> result;
 		
 		srand(seed);
 		vector<tuple<int, double>> trace;

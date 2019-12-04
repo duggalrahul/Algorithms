@@ -1,12 +1,12 @@
 #include "hill_climbing.h"
 
 // function returns a tuple of (optimal tour order, cost of optimal tour and time taken)
-tuple<vector<int>,double,double> hill_climbing(vtup instance,double time,int seed, vector<tuple<int, double>> &trace){
+tuple<vector<int>,int,double> hill_climbing(vtup instance,double time,int seed, vector<tuple<int, double>> &trace){
 
 	const clock_t begin_time = clock();
 	vtup existing_tour = get_random_tour(instance,seed);
 	vtup best_neighbouring_tour;
-	double global_best_cost;
+	int global_best_cost;
 	int i;
 	int iter = 0;
 	double time_in_seconds;
@@ -25,8 +25,8 @@ tuple<vector<int>,double,double> hill_climbing(vtup instance,double time,int see
 
 		// generate neighbours of current tour using 2-opt
 		vector<vtup> neighbours = get_neighbours(existing_tour);
-		double neighbour_best_cost = get_tour_length(existing_tour);
-		long long cost;
+		int neighbour_best_cost = get_tour_length(existing_tour);
+		int cost;
 
 		// iterate through neighbours to find neighbour with lowest cost
 		for(i=0;i<neighbours.size();i++){
@@ -42,7 +42,7 @@ tuple<vector<int>,double,double> hill_climbing(vtup instance,double time,int see
 		if(neighbour_best_cost < global_best_cost){
 			global_best_cost = neighbour_best_cost;
 			existing_tour = best_neighbouring_tour;
-			trace.push_back(make_tuple((int)global_best_cost,double( clock () - begin_time ) /  CLOCKS_PER_SEC));
+			trace.push_back(make_tuple(global_best_cost,double( clock () - begin_time ) /  CLOCKS_PER_SEC));
 		}
 		else{
 			break;

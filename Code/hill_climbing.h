@@ -10,4 +10,4 @@
 using namespace std;
 
 
-tuple<vector<int>,double,double> hill_climbing(vtup instance,double time,int seed, vector<tuple<int, double>> &trace);
+tuple<vector<int>,int,double> hill_climbing(vtup instance,double time,int seed, vector<tuple<int, double>> &trace);

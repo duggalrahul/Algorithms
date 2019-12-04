@@ -3,7 +3,7 @@
 
 // cost1 is cost of existing_tour and cost2 is cost of neighbouring tour
 // if fn returns 1 then we chose neighbour else chose existing
-bool metropolis_criterion(double cost1, double cost2, double T){
+bool metropolis_criterion(int cost1, int cost2, double T){
 	 if(cost2 < cost1){
 	 	return true;
 	 }
@@ -17,7 +17,7 @@ bool metropolis_criterion(double cost1, double cost2, double T){
 
 
 // function returns a tuple of (instance tuple, cost of optimal tour and time taken)
-tuple<vector<int>,double,double> simulated_annealing(vtup instance,double time,int seed, vector<tuple<int, double>> &trace){
+tuple<vector<int>,int,double> simulated_annealing(vtup instance,double time,int seed, vector<tuple<int, double>> &trace){
 
 	const clock_t begin_time = clock();
 	vtup existing_tour = get_random_tour(instance,seed);
@@ -28,9 +28,9 @@ tuple<vector<int>,double,double> simulated_annealing(vtup instance,double time,i
 	int t,max_t = 20000;
 	double T = 10;
 	double a = 0.95; // geometric schedule
-	double best_tour_cost = get_tour_length(existing_tour);
-	double existing_tour_cost = get_tour_length(existing_tour);
-	double neighbour_tour_cost = get_tour_length(existing_tour);
+	int best_tour_cost = get_tour_length(existing_tour);
+	int existing_tour_cost = get_tour_length(existing_tour);
+	int neighbour_tour_cost = get_tour_length(existing_tour);
 	double time_in_seconds;
 
 	for(t=1;t<max_t;t++){
@@ -49,10 +49,11 @@ tuple<vector<int>,double,double> simulated_annealing(vtup instance,double time,i
 		existing_tour_cost = get_tour_length(existing_tour);
 		neighbour_tour_cost = get_tour_length(neighbouring_tour);
 
+
 		if(existing_tour_cost < best_tour_cost){
 			best_tour_cost = existing_tour_cost;
 			best_tour = existing_tour;
-			trace.push_back(make_tuple((int)best_tour_cost,double( clock () - begin_time ) /  CLOCKS_PER_SEC));
+			trace.push_back(make_tuple(best_tour_cost,double( clock () - begin_time ) /  CLOCKS_PER_SEC));
 		}
 
 		if(metropolis_criterion(existing_tour_cost,neighbour_tour_cost,T)){
@@ -65,6 +66,7 @@ tuple<vector<int>,double,double> simulated_annealing(vtup instance,double time,i
 
 	// cout<<"Original cost was "<<get_tour_length(get_random_tour(instance,seed))<<" new cost is "<<get_tour_length(existing_tour)<<endl;
 	// cout<<"Time taken (s) "<<time_in_seconds<<endl;
+
 
 	vector<int> tour;
 	int i;

@@ -55,7 +55,7 @@ typedef vector<tup> vtup;
   }
 };*/
 
-double get_distance(tup city1, tup city2);
+int get_distance(tup city1, tup city2);
 bool check_tour_validness(vtup tour);
 double get_tour_length(vtup tour);
 vtup get_random_tour(vtup instance,int seed);

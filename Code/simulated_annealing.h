@@ -12,5 +12,5 @@ using namespace std;
 
 
 bool metropolis_criterion(double cost1, double cost2, double T);
-tuple<vector<int>,double,double> simulated_annealing(vtup instance,double time,int seed, vector<tuple<int, double>> &trace);
+tuple<vector<int>,int,double> simulated_annealing(vtup instance,double time,int seed, vector<tuple<int, double>> &trace);
 
