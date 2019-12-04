@@ -4,16 +4,19 @@
 
 #include <iostream>
 #include <fstream>
-#include <bits/stdc++.h> 
+// #include <bits/stdc++.h> 
+# include "/Users/rahul/Projects/headers/stdc++.h" // For rahul's macbook
 #include <stdlib.h> 
 #include <sstream>
 #include <iterator>
 #include "branch_and_bound.h"
 #include "Approx.h"
+#include "hill_climbing.h"
+#include "simulated_annealing.h"
 
 using namespace std;
 
-string INPUT_FORMAT = "./main.cpp -inst <filename> -alg [BnB | Approx | LS1 | LS2] -time <cutoff_in_seconds> [-seed <random_seed>]";
+string INPUT_FORMAT = "./main.cpp -inst <filename> -alg [BnB | Approx | hill_climbing | simulated_annealing] -time <cutoff_in_seconds> [-seed <random_seed>]";
 
 
 void throw_input_parse_error(){
@@ -115,265 +118,10 @@ vector<tuple<int,double,double>> read_tsp_file(string filename){
 
 	tspfile.close();
 
-
     return instance;
 
 
 }
-
-typedef tuple<int,double,double> tup;
-typedef vector<tup> vtup;
-
-double get_distance(tup city1, tup city2){
-	double city1_x = get<1>(city1);
-	double city2_x = get<1>(city2);
-	double city1_y = get<2>(city1);
-	double city2_y = get<2>(city2);
-
-	return sqrt((city1_x-city2_x)*(city1_x-city2_x) + (city1_y-city2_y)*(city1_y-city2_y));
-}
-
-
-bool check_tour_validness(vtup tour){
-	if(get<0>(tour[0]) != get<0>(tour[tour.size()-1])){
-		cout<<"Error: The tour should return back to the original location"<<endl;
-		return false;
-	}
-	return true;
-}
-
-double get_tour_length(vtup tour){
-	uint i;
-	double tour_length = 0;
-
-	check_tour_validness(tour);
-	
-
-	for(i=1;i<tour.size();i++){
-		tour_length += get_distance(tour[i],tour[i-1]);
-	}
-
-	return tour_length;
-}
-
-
-// This fucntion generates a random tour which is used to initialize our local search.
-vtup get_random_tour(vtup instance,int seed){
-	
-	random_shuffle(instance.begin(),instance.end());
-
-	// last city should be same as the first
-	instance.push_back(instance[0]);
-
-	return instance;
-}
-
-// This function implements the 2 opt swap outlined at https://en.wikipedia.org/wiki/2-opt
-vtup two_opt_swap(vtup tour,int i,int k){
-	vector<tuple<int,double,double>> new_tour;
-	int j;
-
-	// step 1 in wiki
-	for(j=0;j<i;j++){
-		new_tour.push_back(tour[j]);
-	}
-	// step 2 in wiki
-	for(j=k;j>=i;j--){
-		new_tour.push_back(tour[j]);
-	}
-	// step 3 in wiki
-	for(j=k+1;j<tour.size();j++){
-		new_tour.push_back(tour[j]);
-	}
-
-	return new_tour;
-}
-
-
-void  print_tour(vtup tour){
-	int i;
-
-	check_tour_validness(tour);
-
-	cout<<"Tour ordrering is as below"<<endl;
-	for(i=0;i<tour.size();i++){
-		cout<<get<0>(tour[i])<<endl;
-	}
-}
-
-vector<vtup> get_neighbours(vtup tour){
-
-	check_tour_validness(tour);
-
-	vector<vtup> neighbours;
-	int i,k;
-
-	for(i=1;i<tour.size()-1;i++){
-		for(k=i+1;k<tour.size()-1;k++){
-			
-			vtup neighbour = two_opt_swap(tour,i,k);
-			// cout<<"i "<<i<<" k "<<k<<" cost "<<get_tour_length(neighbour)<<endl;
-			neighbours.push_back(neighbour);
-		}
-	}
-
-	return neighbours;	
-}
-
-// this function constructs a random neighbouring tour using 2-opt
-vtup get_random_neighbour(vtup tour){
-	check_tour_validness(tour);
-
-	// we need two random numbers in [min,max] for call to 2-opt
-	int min = 1;
-	int max = tour.size()-1 - min;
-
-	// get two distinct numbers r1 and r2
-	int r1 = rand() % max + min;
-	int r2 = r1;
-	while(r1 == r2){
-		r2 = rand() % max + min;
-	} 
-
-	// we need to have i<k
-	int i = std::min(r1,r2);
-	int k = std::max(r1,r2);
-
-	// cout<<"random i and k are "<<i<<" "<<k<<endl;
-
-	return two_opt_swap(tour,i,k);
-}
-
-vtup hill_climbing(vtup instance,double time,int seed){
-
-	const clock_t begin_time = clock();
-	vtup existing_tour = get_random_tour(instance,seed);
-	vtup best_neighbouring_tour;
-	double global_best_cost;
-	int i;
-	int iter = 0;
-	double time_in_seconds;
-
-	global_best_cost = get_tour_length(existing_tour);
-
-	while(1){			
-		iter++;
-
-		time_in_seconds = double( clock () - begin_time ) /  CLOCKS_PER_SEC;
-
-
-		if(time_in_seconds > time*60){
-			break;
-		}
-
-		// generate neighbours of current tour using 2-opt
-		vector<vtup> neighbours = get_neighbours(existing_tour);
-		double neighbour_best_cost = get_tour_length(existing_tour);
-		long long cost;
-
-		cout<<"time (s) "<<time_in_seconds<< "num neighbours "<<neighbours.size()<<endl;
-
-		// iterate through neighbours to find neighbour with lowest cost
-		for(i=0;i<neighbours.size();i++){
-			cost = get_tour_length(neighbours[i]);
-
-			if(cost < neighbour_best_cost){
-				best_neighbouring_tour = neighbours[i];
-				neighbour_best_cost = cost;
-			}
-		}
-
-		// if the neighbours optimize global cost, then chose best neighbour else quit
-		if(neighbour_best_cost < global_best_cost){
-			global_best_cost = neighbour_best_cost;
-			existing_tour = best_neighbouring_tour;
-		}
-		else{
-			break;
-		}
-
-		// cout<<"iter "<<iter<<" best cost "<<global_best_cost<<endl;
-
-	}
-
-	cout<<"Original cost was "<<get_tour_length(get_random_tour(instance,seed))<<" new cost is "<<get_tour_length(existing_tour)<<endl;
-	cout<<"Time taken (s) "<<time_in_seconds<<endl;
-
-	return existing_tour;
-}
-
-// cost1 is cost of existing_tour and cost2 is cost of neighbouring tour
-// if fn returns 1 then we chose neighbour else chose existing
-bool metropolis_criterion(double cost1, double cost2, double T){
-	 if(cost2 < cost1){
-	 	return true;
-	 }
-	 double probability = exp((cost1 - cost2) / T);
-
-	 bool TrueFalse = (rand() % 100) < (int)(probability*100);
-
-	 // cout<<" probability "<<probability<<" "<<TrueFalse<<endl;
-
-	 return TrueFalse;
-
-}
-
-
-double simulated_annealing(vtup instance,double time,int seed){
-
-	const clock_t begin_time = clock();
-	vtup existing_tour = get_random_tour(instance,seed);
-	vtup neighbouring_tour = get_random_neighbour(existing_tour);
-	vtup best_tour;
-
-	// Define annealing parameters
-	int t,max_t = 20000;
-	double T = 10;
-	double a = 0.95; // geometric schedule
-	double best_tour_cost = get_tour_length(existing_tour);
-	double existing_tour_cost = get_tour_length(existing_tour);
-	double neighbour_tour_cost = get_tour_length(existing_tour);
-	double time_in_seconds;
-
-	for(t=1;t<max_t;t++){
-
-		time_in_seconds = double( clock () - begin_time ) /  CLOCKS_PER_SEC;
-
-		// cout<<"time (s) "<<time_in_seconds<<endl;
-
-		if(time_in_seconds > time*60){
-			break;
-		}
-
-		// generate random neighbour from current tour
-		vtup neighbouring_tour = get_random_neighbour(existing_tour);
-
-		existing_tour_cost = get_tour_length(existing_tour);
-		neighbour_tour_cost = get_tour_length(neighbouring_tour);
-
-		if(existing_tour_cost < best_tour_cost){
-			best_tour_cost = existing_tour_cost;
-			best_tour = existing_tour;
-		}
-
-		if(metropolis_criterion(existing_tour_cost,neighbour_tour_cost,T)){
-			existing_tour = neighbouring_tour;
-		}
-
-		T = a*T;
-
-		// cout<<"best cost "<<best_tour_cost<<endl;
-
-
-	}
-
-	cout<<"Original cost was "<<get_tour_length(get_random_tour(instance,seed))<<" new cost is "<<get_tour_length(existing_tour)<<endl;
-	cout<<"Time taken (s) "<<time_in_seconds<<endl;
-
-	return 0;
-}
-
-
 
 int main(int argc, char** argv){
 	
@@ -442,17 +190,48 @@ int main(int argc, char** argv){
 		printf("Best Solution (sum):  %d  \n", std::get<0>(solution));
 		printf("Total time:  %f s \n", runtime);
 	}
-	else if(algorithm == (string)"LS1"){
+	else if(algorithm == (string)"hill_climbing"){
 		cout<<"Solving using Hill Climbing"<<endl;
-		srand(seed);
-		hill_climbing(instance,time,seed);
+		tuple<vector<int>,double,double> result;
+		int run = 0, n_runs=10;
+		double average_time = 0, average_cost = 0;
+		for(run=1;run<=n_runs;run++){
+			srand(run+seed);
+			vector<tuple<int, double>> trace;
+			result = hill_climbing(instance,time,seed,trace);
+			average_cost += get<1>(result) / n_runs;
+			average_time += get<2>(result) / n_runs;
+
+			if(run == 1){
+				// string filename, string method, float cutoff, int random_seed,  int best, vector<int> best_sol
+				output_solution(filename, algorithm, time,  run+seed, get<1>(result),  std::get<0>(result));
+				output_trace(filename, algorithm, time, run+seed, trace);
+			}
+		}
+		
+		cout<<fixed<<" City "<<filename<<" algorithm "<<algorithm<<" average time "<<average_time<<" average cost "<<average_cost<<endl;
+		
 	}
-	else if(algorithm == (string)"LS2"){
+	else if(algorithm == (string)"simulated_annealing"){
 		cout<<"Solving using Simulated Annealing"<<endl;
-		srand(seed);		
-		simulated_annealing(instance,time,seed);
+		tuple<vector<int>,double,double> result;
+		int run = 0, n_runs=10;
+		double average_time = 0, average_cost = 0;
+		for(run=1;run<=n_runs;run++){
+			srand(run+seed);
+			vector<tuple<int, double>> trace;
+			result = simulated_annealing(instance,time,seed,trace);
+			average_cost += get<1>(result) / n_runs;
+			average_time += get<2>(result) / n_runs;
+
+			if(run == 1){
+				output_solution(filename, algorithm, time, run+seed,  get<1>(result),  std::get<0>(result));
+				output_trace(filename, algorithm, time, run+seed, trace);
+			}
+		}
+		cout<<fixed<<" City "<<filename<<" algorithm "<<algorithm<<" average time "<<average_time<<" average cost "<<average_cost<<endl;
+		
 	}
-   
   
     return 0; 
 }
