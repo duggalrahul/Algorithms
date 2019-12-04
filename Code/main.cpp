@@ -1,3 +1,4 @@
+// Main function for reading the user input, selecting appropriate algorithm, and creating output files
 #include <iostream>
 #include <fstream>
 #include <algorithm>

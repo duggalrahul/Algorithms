@@ -1,3 +1,4 @@
+// Header file for Hill Climbing algorithm
 #include <iostream>
 #include <fstream>
 #include <algorithm>

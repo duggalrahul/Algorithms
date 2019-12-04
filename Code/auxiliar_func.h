@@ -1,3 +1,4 @@
+//Header file for auxiliary functions
 #pragma once
 
 #include <iostream>

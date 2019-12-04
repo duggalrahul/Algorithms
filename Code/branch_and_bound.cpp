@@ -1,3 +1,5 @@
+// Implements Branch and Bound Algorithm to find a TSP Solution
+
 #include "branch_and_bound.h"
 
 

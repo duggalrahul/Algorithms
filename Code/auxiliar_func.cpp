@@ -1,3 +1,4 @@
+// Contains functions common to all algorithms (creating distance matrix, O/P files, etc.)
 #include "auxiliar_func.h"
 using namespace std;
 
