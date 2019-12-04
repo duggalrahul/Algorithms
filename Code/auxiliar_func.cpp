@@ -196,7 +196,11 @@ int output_trace(string filename, string method, float cutoff, int random_seed, 
 		
 		for (int i = 0; i < trace.size(); i++)
 		{
-			sol_file << std::fixed << std::setprecision(2) << std::get<1>(trace[i]) << ", " << std::get<0>(trace[i]) << endl;
+			sol_file << std::fixed << std::setprecision(2) << std::get<1>(trace[i]) << ", " << std::get<0>(trace[i]);
+            if (i < (trace.size()-1) )
+            {
+                sol_file << endl;
+            }
 		}
 
 		sol_file.close();
@@ -227,7 +231,12 @@ int output_trace(string filename, string method, float cutoff, vector<tuple<int,
 		
 		for (int i = 0; i < trace.size(); i++)
 		{
-			sol_file << std::fixed << std::setprecision(2) << std::get<1>(trace[i]) << ", " << std::get<0>(trace[i]) << endl;
+			sol_file << std::fixed << std::setprecision(2) << std::get<1>(trace[i]) << ", " << std::get<0>(trace[i]);
+            
+            if (i < (trace.size()-1) )
+            {
+                sol_file << endl;
+            }
 		}
 
 		sol_file.close();
