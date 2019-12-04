@@ -22,7 +22,7 @@ tuple<int,vector<int>> Approx(vector<vector<int>> dist, float time, int seed){
     path.push_back(newVertex);
     pathLength += 2*dist[seed][newVertex];
     vertexOnPath[newVertex] = true;
-    distFromPath[newVertex] = INT_MAX;
+    distFromPath[newVertex] = inf;
 
     for(unsigned int i = 0; i < nVertices;  i++){
         if(!vertexOnPath[i])
@@ -34,7 +34,7 @@ tuple<int,vector<int>> Approx(vector<vector<int>> dist, float time, int seed){
         // Find the next vertex to be added to the path
         newVertex =  std::min_element(distFromPath.begin(),distFromPath.end())-distFromPath.begin();
         vertexOnPath[newVertex] = true;
-        distFromPath[newVertex] = INT_MAX;
+        distFromPath[newVertex] = inf;
 
         for(unsigned int i = 0; i < nVertices;  i++){
             if(!vertexOnPath[i])

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <bits/stdc++>
+#include <algorithm>
 //#include "/Users/rahul/Projects/headers/stdc++.h" // For rahul's macbook
 #include <stdlib.h> 
 #include <sstream>

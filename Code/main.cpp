@@ -1,14 +1,11 @@
-// compile : g++ -Wall -o main main.cpp
-// execute : ./main -inst "../DATA/Atlanta.tsp" -alg "BnB" -time 10 -seed 0
-
-
 #include <iostream>
 #include <fstream>
-#include <bits/stdc++.h> 
+#include <algorithm>
 //# include "/Users/rahul/Projects/headers/stdc++.h" // For rahul's macbook
 #include <stdlib.h> 
 #include <sstream>
 #include <iterator>
+#include "auxiliar_func.h"
 #include "branch_and_bound.h"
 #include "Approx.h"
 #include "hill_climbing.h"
@@ -137,8 +134,6 @@ int main(int argc, char** argv){
 
 	// read .tsp file specified by -inst
 	vector<tuple<int, double, double>> instance;
-
-	printf("%s \n", filename.c_str());
 	instance = read_tsp_file(filename);
 
 	int n = instance.size();
@@ -180,8 +175,8 @@ int main(int argc, char** argv){
 		result = hill_climbing(instance,time,seed,trace);// Run hill climbing algorithm
 		
         // Save solution file and trace file
-		output_solution(filename, algorithm, time,  run, get<1>(result),  std::get<0>(result));
-		output_trace(filename, algorithm, time, run, trace);
+		output_solution(filename, algorithm, time,  seed, get<1>(result),  std::get<0>(result));
+		output_trace(filename, algorithm, time, seed, trace);
 			
 	}
 	else if(algorithm == (string)"LS2"){		

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <iostream>
 #include <stdio.h>
 #include <vector>
 #include <tuple>
 #include <math.h>
+#include <algorithm>
 //#include "/Users/rahul/Projects/headers/stdc++.h" // For rahul's macbook
 #include <fstream>
 #include <string>
@@ -18,7 +20,7 @@ using std::string;
 
 using namespace std;
 
-extern int inf ;
+extern int inf;
 
 vector<vector<int>> compute_dist_matrix(vector<double> coord_x, vector<double> coord_y);
 

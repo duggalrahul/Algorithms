@@ -7,16 +7,16 @@ main.o: main.cpp
 auxiliar_func.o: auxiliar_func.cpp auxiliar_func.h
 	g++ -c auxiliar_func.cpp
 
-Approx.o: Approx.cpp Approx.h
+Approx.o: Approx.cpp Approx.h auxiliar_func.h
 	g++ -c Approx.cpp
 
-simulated_annealing.o: simulated_annealing.cpp simulated_annealing.h
+simulated_annealing.o: simulated_annealing.cpp simulated_annealing.h auxiliar_func.h
 	g++ -c simulated_annealing.cpp
 
-hill_climbing.o: hill_climbing.cpp hill_climbing.h
+hill_climbing.o: hill_climbing.cpp hill_climbing.h auxiliar_func.h
 	g++ -c hill_climbing.cpp
 
-branch_and_bound.o: branch_and_bound.cpp branch_and_bound.h
+branch_and_bound.o: branch_and_bound.cpp branch_and_bound.h auxiliar_func.h
 	g++ -c branch_and_bound.cpp
 
 clean:
