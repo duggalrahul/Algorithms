@@ -143,94 +143,58 @@ int main(int argc, char** argv){
 
 	int n = instance.size();
 
+    // Compute the distance matrix
 	vector<vector<int>> distance_matrix = compute_dist_matrix( instance );
 
 	if(algorithm == (string)"BnB"){
+        
+        // Initialize variables
 		vector<int>  best_sol;
 		best_sol.resize(n, 0);
 		int best = inf;
 		vector<tuple<int, double>> trace;
+        
 		double start_time = double(clock());
-		branch_and_bound(distance_matrix, double (time), best, best_sol, trace);
-
-		printf("Best Solution:  %d \n", best);	
-
-
-		int sum = 0;
-		for (int row = 0; row < n; row++)
-		{
-			//printf(" %d --->  %d \n", row, best_sol[row]);
-
-			sum += distance_matrix[row][best_sol[row]];
-		}
-
-		printf("Best Solution (sum):  %d  \n", sum);
-
+		branch_and_bound(distance_matrix, double (time), best, best_sol, trace);// Run Branch and bound algorithm
 		double runtime = double(clock() - start_time) / double(CLOCKS_PER_SEC);
 
-		printf("Total time:  %f s \n", runtime);
-
-		for (int row = 0; row < trace.size(); row++)
-		{
-			printf(" Solution %d  time %f \n", std::get<0>(trace[row]), std::get<1>(trace[row]));
-
-		}
-
+        // Save solution file and trace file
 		output_solution(filename, algorithm, time,  best,  best_sol);
 		output_trace(filename, algorithm, time, trace);
 
-		printf("Finished!!\n");
 	}
 	else if(algorithm == (string)"Approx"){
-		vector<vector<int>> distance_matrix = compute_dist_matrix( instance );
+        
 		double start_time = double(clock());
-		tuple<int,vector<int>> solution = Approx(distance_matrix, time, seed);
-		output_solution(filename, algorithm, time,  std::get<0>(solution),  std::get<1>(solution));
+		tuple<int,vector<int>> solution = Approx(distance_matrix, time, seed);// Run approximation algorithm
 		double runtime = double(clock() - start_time) / double(CLOCKS_PER_SEC);
-		printf("Best Solution (sum):  %d  \n", std::get<0>(solution));
-		printf("Total time:  %f s \n", runtime);
+        
+        // Save solution file
+        output_solution(filename, algorithm, time,  std::get<0>(solution),  std::get<1>(solution));
 	}
-	else if(algorithm == (string)"hill_climbing"){
-		cout<<"Solving using Hill Climbing"<<endl;
+	else if(algorithm == (string)"LS1"){		
 		tuple<vector<int>,double,double> result;
-		int run = 0, n_runs=10;
-		double average_time = 0, average_cost = 0;
-		for(run=1;run<=n_runs;run++){
-			srand(run+seed);
-			vector<tuple<int, double>> trace;
-			result = hill_climbing(instance,time,seed,trace);
-			average_cost += get<1>(result) / n_runs;
-			average_time += get<2>(result) / n_runs;
-
-			if(run == 1){
-				// string filename, string method, float cutoff, int random_seed,  int best, vector<int> best_sol
-				output_solution(filename, algorithm, time,  run+seed, get<1>(result),  std::get<0>(result));
-				output_trace(filename, algorithm, time, run+seed, trace);
-			}
-		}
 		
-		cout<<fixed<<" City "<<filename<<" algorithm "<<algorithm<<" average time "<<average_time<<" average cost "<<average_cost<<endl;
+		srand(seed);
+		vector<tuple<int, double>> trace;
+		result = hill_climbing(instance,time,seed,trace);// Run hill climbing algorithm
 		
+        // Save solution file and trace file
+		output_solution(filename, algorithm, time,  run, get<1>(result),  std::get<0>(result));
+		output_trace(filename, algorithm, time, run, trace);
+			
 	}
-	else if(algorithm == (string)"simulated_annealing"){
-		cout<<"Solving using Simulated Annealing"<<endl;
+	else if(algorithm == (string)"LS2"){		
 		tuple<vector<int>,double,double> result;
-		int run = 0, n_runs=10;
-		double average_time = 0, average_cost = 0;
-		for(run=1;run<=n_runs;run++){
-			srand(run+seed);
-			vector<tuple<int, double>> trace;
-			result = simulated_annealing(instance,time,seed,trace);
-			average_cost += get<1>(result) / n_runs;
-			average_time += get<2>(result) / n_runs;
-
-			if(run == 1){
-				output_solution(filename, algorithm, time, run+seed,  get<1>(result),  std::get<0>(result));
-				output_trace(filename, algorithm, time, run+seed, trace);
-			}
-		}
-		cout<<fixed<<" City "<<filename<<" algorithm "<<algorithm<<" average time "<<average_time<<" average cost "<<average_cost<<endl;
 		
+		srand(seed);
+		vector<tuple<int, double>> trace;
+		result = simulated_annealing(instance,time,seed,trace);	// Run simulated annealing algorithm
+
+		// Save solution file and trace file
+		output_solution(filename, algorithm, time, seed,  get<1>(result),  std::get<0>(result));
+		output_trace(filename, algorithm, time, seed, trace);
+			
 	}
   
     return 0; 
