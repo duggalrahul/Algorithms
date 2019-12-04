@@ -2,7 +2,8 @@
 
 #include <vector> 
 #include <map>
-#include <bits/stdc++.h> 
+// #include <bits/stdc++.h> 
+#include "/Users/rahul/Projects/headers/stdc++.h" // For rahul's macbook
 #include <math.h>
 #include <time.h>
 #include <tuple>
